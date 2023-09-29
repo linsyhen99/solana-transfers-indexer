@@ -9,19 +9,28 @@ const fastify = Fastify({
   logger: true,
 });
 
+let transactionSignatures: string[] = [];
+
 // This endpoint listens to webhooks posted from the dev-portal webhook feature,
 // you can expose your application on a localhost through a proxy/localtunnel
 // or you can host this server somewhere to receive webhooks.
 fastify.post("/", async (request, reply) => {
   console.log(request.body);
-  process.exit(1);
   const transactionEvent: ParsedTransaction = request.body as ParsedTransaction;
-  // const result = await retrieveTransfers();
+  transactionSignatures.push(
+    transactionEvent.transaction.transaction.signatures[0]
+  );
+
+  if (transactionSignatures.length == 50) {
+    await retrieveTransfers();
+  }
+
+  return (reply.statusCode = 200);
 });
 
 fastify.listen(
   {
-    port: parseInt(process.env.SERVER_PORT || "3000"),
+    port: parseInt(process.env.SERVER_PORT || "6969"),
     host: "0.0.0.0",
   },
   (request, reply) => {
@@ -29,11 +38,11 @@ fastify.listen(
   }
 );
 
-const retrieveTransfers = async (transactionHash: string) => {
+const retrieveTransfers = async () => {
   const response = await axios.post(
     process.env.SOLANAFM_API_URL + "/vo/transfers",
     {
-      transactionHashes: [transactionHash],
+      transactionHashes: transactionSignatures,
     },
     {
       headers: {
@@ -43,5 +52,6 @@ const retrieveTransfers = async (transactionHash: string) => {
     }
   );
 
+  transactionSignatures = [];
   console.log("Transfers data retrieved: ", response.data);
 };

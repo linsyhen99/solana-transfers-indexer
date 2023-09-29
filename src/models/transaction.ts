@@ -5,7 +5,30 @@ export interface ParsedTransaction {
   block_time: number;
 }
 
-interface EncodedTransactionsWithStatusMeta {}
+interface EncodedTransactionsWithStatusMeta {
+  transaction: EncodedTransaction;
+  meta: any;
+  blockTime: number;
+}
+
+interface EncodedTransaction {
+  signatures: string[];
+  message: EncodedMessage;
+}
+
+interface EncodedMessage {
+  accountKeys: AcccountKey[];
+  recentBlockhash: string;
+  instructions: any[];
+  addresstableLookups: any;
+}
+
+interface AcccountKey {
+  pubkey: string;
+  writable: boolean;
+  signer: boolean;
+  source: string;
+}
 
 interface ParsedEvent {
   name: string;
