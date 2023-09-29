@@ -19,10 +19,6 @@ fastify.post("/", async (request, reply) => {
   transactionSignatures.push(
     transactionEvent.transaction.transaction.signatures[0]
   );
-  // console.log(
-  //   "Received transaction signature for transfer instruction: ",
-  //   transactionEvent.transaction.transaction.signatures[0]
-  // );
 
   if (transactionSignatures.length == 100) {
     await retrieveTransfers();
