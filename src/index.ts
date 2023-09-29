@@ -15,13 +15,16 @@ let transactionSignatures: string[] = [];
 // you can expose your application on a localhost through a proxy/localtunnel
 // or you can host this server somewhere to receive webhooks.
 fastify.post("/", async (request, reply) => {
-  console.log(request.body);
   const transactionEvent: ParsedTransaction = request.body as ParsedTransaction;
   transactionSignatures.push(
     transactionEvent.transaction.transaction.signatures[0]
   );
+  console.log(
+    "Received transaction signature for transfer instruction: ",
+    transactionEvent.transaction.transaction.signatures[0]
+  );
 
-  if (transactionSignatures.length == 50) {
+  if (transactionSignatures.length == 100) {
     await retrieveTransfers();
   }
 
@@ -40,7 +43,7 @@ fastify.listen(
 
 const retrieveTransfers = async () => {
   const response = await axios.post(
-    process.env.SOLANAFM_API_URL + "/vo/transfers",
+    process.env.SOLANAFM_API_URL + "/v0/transfers",
     {
       transactionHashes: transactionSignatures,
     },
